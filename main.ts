@@ -1,4 +1,4 @@
-// Validate the adjacent summary and copy its exact bytes to the entry output.
+// Validate the adjacent summary and write it to the make.fun entry path.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,4 +15,5 @@ if (characterCount < 1 || characterCount > 2000 || summary.trim().length === 0) 
 
 const outputPath = join(process.env.MAKEFUN_OUTPUT_DIR ?? '/output', 'entry.txt');
 mkdirSync(dirname(outputPath), { recursive: true });
-writeFileSync(outputPath, source);
+const output = source.at(-1) === 0x0a ? source.subarray(0, -1) : source;
+writeFileSync(outputPath, output);
