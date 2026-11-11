@@ -1,12 +1,18 @@
-// A working news-summary-01 entry (Node 22, standard library only): its summary is the summary.txt beside this file,
-// and the program copies it to /output/entry.txt. A starting point, not a winner: rewrite the summary. The gate takes
-// UTF-8 text of 1 to 2,000 characters that is not only white space, and the judge reads exactly the bytes copied, so
-// write no line end you do not mean to show.
-//
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// Validate the adjacent summary and copy its exact bytes to the entry output.
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { copyFileSync } from 'node:fs';
-import { join } from 'node:path';
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const source = readFileSync(join(scriptDir, 'summary.txt'));
+const summary = source.toString('utf8');
+const characterCount = Array.from(summary).length;
 
-copyFileSync(new URL('./summary.txt', import.meta.url), join(process.env.MAKEFUN_OUTPUT_DIR ?? '/output', 'entry.txt'));
+if (characterCount < 1 || characterCount > 2000 || summary.trim().length === 0) {
+  console.error('summary.txt must contain 1–2000 characters and not be only whitespace.');
+  process.exit(1);
+}
+
+const outputPath = join(process.env.MAKEFUN_OUTPUT_DIR ?? '/output', 'entry.txt');
+mkdirSync(dirname(outputPath), { recursive: true });
+writeFileSync(outputPath, source);
